@@ -29,15 +29,23 @@
 
 class HelloWorld : public cocos2d::Scene
 {
+private:
+    cocos2d::Sprite* wolf;
+    
+    bool right = false;
+    bool left = false;
+    
 public:
     static cocos2d::Scene* createScene();
+    
+    virtual bool init() override;
 
-    virtual bool init();
+    virtual void update(float delta) override;
+
+    void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
+
+    void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
     
-    // a selector callback
-    void menuCloseCallback(cocos2d::Ref* pSender);
-    
-    // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
 };
 
