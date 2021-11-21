@@ -9,13 +9,17 @@ class HelloWorld : public cocos2d::Scene
 private:
     Wolf* wolf;
     cocos2d::Sprite* basket;
+    cocos2d::Sprite* lifes[5];
     cocos2d::Label* scoreLabel;
+    cocos2d::Size visibleSize;
     
     int counter = 0;
     int life = 5;
     
-    bool right = false;
+    bool right = true;
     bool left = false;
+    bool top = false;
+    bool bottom = true;
     
 public:
     static cocos2d::Scene* createScene();

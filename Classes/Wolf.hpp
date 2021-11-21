@@ -8,6 +8,8 @@ class Wolf : public cocos2d::Sprite
 private:
     bool goRight;
     bool goLeft;
+    bool goTop;
+    bool goBottom;
     
     cocos2d::Sprite* basket;
     cocos2d::Scene* mainSceneRef;
@@ -22,6 +24,10 @@ public:
     void setGoRight(bool right);
     
     void setGoLeft(bool left);
+    
+    void setGoTop(bool top);
+    
+    void setGoBottom(bool bottom);
     
     void setMainSceneRef(cocos2d::Scene* sceneRef);
     

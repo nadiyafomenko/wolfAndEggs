@@ -1,4 +1,5 @@
 #include "HelloWorldScene.h"
+#include "GameOverScene.hpp"
 #include "Egg.hpp"
 #include "Wolf.hpp"
 #include <string>
@@ -13,11 +14,27 @@ Scene* HelloWorld::createScene()
 void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 {
     if((int)keyCode == 27) {
+        wolf->setPosition(cocos2d::Vec2(visibleSize.width / 2 + 220, wolf->getPosition().y));
         right = true;
+        left = false;
     }
     
     if((int)keyCode == 26) {
+        wolf->setPosition(cocos2d::Vec2(visibleSize.width / 2 - 220, wolf->getPosition().y));
         left = true;
+        right = false;
+    }
+    
+    if((int)keyCode == 28) {
+        wolf->setPosition(cocos2d::Vec2(wolf->getPosition().x, wolf->getPosition().y + 70));
+        top = true;
+        bottom = false;
+    }
+    
+    if((int)keyCode == 29) {
+        wolf->setPosition(cocos2d::Vec2(wolf->getPosition().x, wolf->getPosition().y - 70));
+        bottom = true;
+        top = false;
     }
 
 }
@@ -52,7 +69,6 @@ cocos2d::Sprite*  HelloWorld::createLifeSprite(cocos2d::Vec2 coordinates)
     Sprite* heart = Sprite::create("heart.png");
     heart->setScale(0.07);
     heart->setPosition(coordinates);
-    heart->setTag(2);
     return heart;
 }
 
@@ -75,7 +91,7 @@ bool HelloWorld::init()
         return false;
     }
 
-    auto visibleSize = Director::getInstance()->getVisibleSize();
+    visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     
     Vec2 center = Vec2(visibleSize.width/2, visibleSize.height/2);
@@ -93,13 +109,19 @@ bool HelloWorld::init()
     this->addChild(background);
     
     wolf =  Wolf::createWolf(this, right, left);
-   
-    this->schedule(SEL_SCHEDULE(&HelloWorld::generateEgg), 2);
+    basket = wolf->getBasketRef();
+    
+    this->schedule(SEL_SCHEDULE(&HelloWorld::generateEgg), 3);
 
     scoreLabel = Label::createWithTTF("Score: 0", "fonts/arial.ttf", 36);
     scoreLabel->setPosition(Vec2(120, 650));
     
     this->addChild(scoreLabel);
+    
+    for (int i = 0; i < life; i++) {
+        lifes[i] = createLifeSprite(Vec2(600 + i * 50, 650));
+        this->addChild(lifes[i]);
+    }
     
     this->scheduleUpdate();
     return true;
@@ -108,12 +130,19 @@ bool HelloWorld::init()
 
 void HelloWorld::update(float delta)
 {
-//    this->removeChildByTag(2);
-//    CCLOG("life %d", life);
-//    for (int i = 0; i <= life; i++) {
-//        this->addChild(createLifeSprite(Vec2(600 + i * 50, 650)));
-//    }
+    CCLOG("life %d", life);
+  
+    if (life == 0) {
+        Director::getInstance()->replaceScene(GameOverScene::createScene(counter));
+    }
+    
+    if (life > 0 && life < 5 && lifes[life] != NULL) {
+        this->removeChild(lifes[life]);
+    }
+   
     scoreLabel->setString("Score: " + std::to_string(counter));
     wolf->setGoLeft(left);
     wolf->setGoRight(right);
+    wolf->setGoTop(top);
+    wolf->setGoBottom(bottom);
 }
