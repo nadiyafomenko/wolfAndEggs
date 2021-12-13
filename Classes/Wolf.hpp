@@ -29,6 +29,10 @@ public:
     
     void setGoBottom(bool bottom);
     
+    bool isOnBottom();
+    
+    bool isOnTop();
+    
     void setMainSceneRef(cocos2d::Scene* sceneRef);
     
     cocos2d::Sprite* getBasketRef();

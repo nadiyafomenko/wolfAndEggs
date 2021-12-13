@@ -10,7 +10,9 @@ class Egg : public cocos2d::Sprite
 private:
     Wolf* wolfRef;
     int eggPosition = rand() % 4 + 1;
+    // int eggPosition = 2;
     bool catched = false;
+    bool halfCracked = false;
     
     HelloWorld* sceneRef;
     

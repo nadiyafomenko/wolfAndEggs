@@ -3,6 +3,7 @@
 #include "Egg.hpp"
 #include "Wolf.hpp"
 #include <string>
+#include "Life.hpp"
 
 USING_NS_CC;
 
@@ -54,20 +55,21 @@ void HelloWorld::setCounter(int count)
     this->counter = count;
 }
 
-int HelloWorld::getLife()
+double HelloWorld::getLife()
 {
     return this->life;
 }
 
-void HelloWorld::setLife(int life)
+void HelloWorld::setLife(double life)
 {
     this->life = life;
 }
 
-cocos2d::Sprite*  HelloWorld::createLifeSprite(cocos2d::Vec2 coordinates)
+cocos2d::Sprite*  HelloWorld::createLifeSprite(cocos2d::Vec2 coordinates, std::string png)
 {
-    Sprite* heart = Sprite::create("heart.png");
+    Sprite* heart = Sprite::create(png);
     heart->setScale(0.07);
+    heart->setName("heart");
     heart->setPosition(coordinates);
     return heart;
 }
@@ -81,6 +83,10 @@ void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event)
     if((int)keyCode == 26) {
         left = false;
     }
+}
+
+void HelloWorld::generateLifes(cocos2d::Scene* scene, int lifes, bool lastBroken) {
+  
 }
 
 
@@ -108,8 +114,12 @@ bool HelloWorld::init()
     
     this->addChild(background);
     
+    auto gerb = Sprite::create("gerb.png");
+    gerb->setPosition(900, 60);
+    gerb->setScale(0.2);
+    this->addChild(gerb);
+    
     wolf =  Wolf::createWolf(this, right, left);
-    basket = wolf->getBasketRef();
     
     this->schedule(SEL_SCHEDULE(&HelloWorld::generateEgg), 3);
 
@@ -118,9 +128,9 @@ bool HelloWorld::init()
     
     this->addChild(scoreLabel);
     
-    for (int i = 0; i < life; i++) {
-        lifes[i] = createLifeSprite(Vec2(600 + i * 50, 650));
-        this->addChild(lifes[i]);
+    for (int i = 0; i < 5; i++) {
+        Life* lifeSptite = Life::createLife(this, cocos2d::Vec2(600 + i * 50, 650));
+        lifesVector.push_back(lifeSptite);
     }
     
     this->scheduleUpdate();
@@ -130,16 +140,38 @@ bool HelloWorld::init()
 
 void HelloWorld::update(float delta)
 {
-    CCLOG("life %d", life);
-  
-    if (life == 0) {
+    if (lifesVector.size() == 0) {
         Director::getInstance()->replaceScene(GameOverScene::createScene(counter));
+        return;
     }
-    
-    if (life > 0 && life < 5 && lifes[life] != NULL) {
-        this->removeChild(lifes[life]);
+  
+    if (life != lifePrev) {
+        if (lifePrev - life == 1 && lifesVector.back()->getIsBroken()) {
+            lifesVector.back()->removeFromParent();
+            lifesVector.pop_back();
+            lifesVector.back()->broke();
+            lifePrev = life;
+            return;
+        }
+        if (lifePrev - life == 1 && !lifesVector.back()->getIsBroken()) {
+            lifesVector.back()->removeFromParent();
+            lifesVector.pop_back();
+            lifePrev = life;
+            return;
+        }
+        if (lifePrev - life == 0.5 && !lifesVector.back()->getIsBroken()) {
+            lifesVector.back()->broke();
+            lifePrev = life;
+            return;
+        }
+        if (lifePrev - life == 0.5 && lifesVector.back()->getIsBroken()) {
+            lifesVector.back()->removeFromParent();
+            lifesVector.pop_back();
+            lifePrev = life;
+            return;
+        }
     }
-   
+
     scoreLabel->setString("Score: " + std::to_string(counter));
     wolf->setGoLeft(left);
     wolf->setGoRight(right);

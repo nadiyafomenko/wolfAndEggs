@@ -2,7 +2,6 @@
 #define MenuScene_hpp
 
 #include <stdio.h>
-
 #include "cocos2d.h"
 
 class MenuScene : public cocos2d::Scene

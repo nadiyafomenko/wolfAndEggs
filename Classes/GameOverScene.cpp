@@ -4,16 +4,20 @@
 #include <stdio.h>
 #include <string.h>
 
-cocos2d::Scene* GameOverScene::createScene(int score)
+cocos2d::Scene* GameOverScene::createScene(int counter)
 {
     auto scene = GameOverScene::create();
-    scene->setScore(score);
+    scene->setScore(counter);
     return scene;
 }
 
-void GameOverScene::setScore(int score)
+void GameOverScene::setScore(int counter)
 {
-    this->score = score;
+    score = counter;
+}
+
+int GameOverScene::getScore() {
+    return score;
 }
 
 bool GameOverScene::init()
@@ -22,7 +26,7 @@ bool GameOverScene::init()
     {
         return false;
     }
-
+    
     auto visibleSize = cocos2d::Director::getInstance()->getVisibleSize();
     cocos2d::Vec2 origin = cocos2d::Director::getInstance()->getVisibleOrigin();
     
@@ -46,14 +50,15 @@ bool GameOverScene::init()
     cocos2d::Action* chickenAnimation = cocos2d::Sequence::create(cocos2d::DelayTime::create(2), cocos2d::ScaleBy::create(0.2, 35), cocos2d::ScaleBy::create(0.6, 15), NULL);
     chicken->runAction(chickenAnimation);
     
-    auto score = cocos2d::Label::createWithTTF("", "fonts/arial.ttf", 36);
-    score->setString("Your score: " + std::to_string(this->score));
-    score->setPosition(cocos2d::Vec2(visibleSize.width / 2, 250));
-    score->setOpacity(1);
-    this->addChild(score);
+   
+    scoreLabel = cocos2d::Label::createWithTTF("", "fonts/arial.ttf", 36);
+   
+    scoreLabel->setPosition(cocos2d::Vec2(visibleSize.width / 2, 250));
+    scoreLabel->setOpacity(1);
+    this->addChild(scoreLabel);
     
     cocos2d::Action* scoreAnimation = cocos2d::Sequence::create(cocos2d::DelayTime::create(3), cocos2d::FadeIn::create(0.5), cocos2d::ScaleBy::create(0.2, 1.2), NULL);
-    score->runAction(scoreAnimation);
+    scoreLabel->runAction(scoreAnimation);
     
     auto button = cocos2d::ui::Button::create("restart.png");
     button->setPosition(cocos2d::Vec2(visibleSize.width / 2, 100));
@@ -94,5 +99,5 @@ bool GameOverScene::init()
 
 void GameOverScene::update(float delta)
 {
-
+    scoreLabel->setString("Your score: " + std::to_string(this->getScore()));
 }

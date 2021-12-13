@@ -30,6 +30,14 @@ void Wolf::setGoBottom(bool bottom)
     goBottom = bottom;
 }
 
+bool Wolf::isOnBottom(){
+    return goBottom;
+}
+
+bool Wolf::isOnTop(){
+    return goTop;
+}
+
 void Wolf::setMainSceneRef(cocos2d::Scene* sceneRef)
 {
     mainSceneRef = sceneRef;
@@ -50,16 +58,9 @@ bool Wolf::init()
     auto visibleSize = cocos2d::Director::getInstance()->getVisibleSize();
     
     this->setTexture("wolf1.png");
-    
-    basket = cocos2d::Sprite::create("baskett.png");
-    // basket->setPosition(cocos2d::Vec2(508, 270));
-
-    this->setAnchorPoint(cocos2d::Vec2(1, 0.5));
    
     this->setPosition(cocos2d::Vec2(visibleSize.width / 2 + 200, 150));
     this->setScale(0.7);
-    
-    // this->addChild(basket);
     
     this->scheduleUpdate();
     return true;
@@ -72,20 +73,20 @@ void Wolf::update(float delta)
     if (goRight) {
         this->setFlippedX(false);
         this->setAnchorPoint(cocos2d::Vec2(1, 0.5));
-        // basket->setPosition(cocos2d::Vec2(508, 270));
     }
     
     if (goLeft) {
         this->setFlippedX(true);
         this->setAnchorPoint(cocos2d::Vec2(0, 0.5));
-        // basket->setPosition(cocos2d::Vec2(90, 270));
     }
     
     if (goTop) {
         this->setTexture("wolf2.png");
+        goBottom = false;
     }
     
     if (goBottom) {
         this->setTexture("wolf1.png");
+        goTop = false;
     }
 }

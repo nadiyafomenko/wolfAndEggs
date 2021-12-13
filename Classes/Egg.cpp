@@ -27,8 +27,8 @@ bool Egg::init()
     {
         return false;
     }
-    this->setTexture("egg1.png");
-    this->setScale(1.2);
+    this->setTexture("egg-normal.png");
+    this->setScale(0.15);
     
     if (this->eggPosition == 1) {
         this->setPosition(cocos2d::Vec2(-10, 540));
@@ -61,6 +61,7 @@ void Egg::update(float delta)
 {
     cocos2d::Vec2 position = this->getPosition();
     
+    // egg move
     if (position.y >= 60) {
         if (this->eggPosition == 1 || this->eggPosition == 2) {
             if (position.x >= 290) {
@@ -78,21 +79,51 @@ void Egg::update(float delta)
         
     }
 
-    if ((eggPosition == 1 || eggPosition == 3) && wolfRef->getPosition().getDistance(position) < 100 && position.y > 300) {
-        sceneRef->setCounter(sceneRef->getCounter() + 1);
-        this->removeFromParent();
+    if (catched) {
+        return;
     }
     
-    if ((eggPosition == 2 || eggPosition == 4) && wolfRef->getPosition().getDistance(position) < 80 && position.y > 200) {
-        sceneRef->setCounter(sceneRef->getCounter() + 1);
-        this->removeFromParent();
+    // egg with position 1 or 3
+    if (eggPosition == 1 || eggPosition == 3) {
+        if (this->getPosition().y < 300) {
+            halfCracked = true;
+            this->setTexture("egg-cracked.png");
+        }
+        
+        if (wolfRef->getPosition().getDistance(position) < 105 && wolfRef->isOnTop() && !halfCracked) {
+            catched = true;
+            sceneRef->setCounter(sceneRef->getCounter() + 2);
+            this->removeFromParent();
+            return;
+        }
+        
+        if (wolfRef->getPosition().getDistance(position) < 60 && wolfRef->isOnBottom() && halfCracked) {
+            catched = true;
+            sceneRef->setLife(sceneRef->getLife() - 0.5);
+            sceneRef->setCounter(sceneRef->getCounter() + 1);
+            this->removeFromParent();
+            return;
+        }
     }
+
     
-    if (position.y <= 60 && this->getTexture()->getName() == 9) {
+    // egg with position 2 or 4
+    if (eggPosition == 2 || eggPosition == 4) {
+        if (wolfRef->getPosition().getDistance(position) < 80 && position.y > 200 && wolfRef->isOnBottom()) {
+            catched = true;
+            sceneRef->setCounter(sceneRef->getCounter() + 2);
+            this->removeFromParent();
+        }
+    }
+
+  
+    
+    if (position.y <= 60 && !catched) {
+        auto texture = this->getTexture();
         this->setTexture("egg2.png");
         sceneRef->setLife(sceneRef->getLife() - 1);
         this->stopAllActions();
-        this->runAction(cocos2d::Sequence::create(cocos2d::DelayTime::create(2), NULL));
+        this->runAction(cocos2d::DelayTime::create(2));
         this->removeFromParentAndCleanup(true);
     }
     
